@@ -17,6 +17,7 @@ class ModelTestCase(TestCase):
         )
 
         self.assertEqual(user.email, email)
+        self.assertTrue(user.is_freelancer)
         self.assertTrue(user.check_password(password))
 
     def test_new_user_email_normalized(self):
@@ -48,3 +49,30 @@ class ModelTestCase(TestCase):
         )
 
         self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_moderator)
+
+    def test_create_superuser(self):
+        """Test creating a user with an email is successful."""
+        email = 'test@example.com'
+        password = 'testpass123'
+        user = get_user_model().objects.create_super_user(
+            email=email,
+            password=password,
+        )
+
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_moderator)
+
+
+    def test_create_employer(self):
+        """Test creating an employer is successful."""
+        email = 'test_employer@example.com'
+        password = 'testpass123'
+        user = get_user_model().objects.create_employer(
+            email=email,
+            password=password,
+        )
+
+        self.assertFalse(user.is_superuser)
+        self.assertFalse(user.is_moderator)
+        self.assertTrue(user.is_employer)

@@ -16,6 +16,7 @@ class UserManager(BaseUserManager):
             raise ValueError('User must have an email address.')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
+        user.is_freelancer = True
         user.save(using=self._db)
 
         return user
@@ -24,6 +25,15 @@ class UserManager(BaseUserManager):
         """Create, save and return a new user"""
         user = self.create_user(email, password)
         user.is_superuser = True
+        user.is_moderator = True
+        user.save(using=self._db)
+
+        return user
+
+    def create_employer(self, email, password):
+        """Create, save and return an employer user"""
+        user = self.create_user(email, password)
+        user.is_employer = True
         user.save(using=self._db)
 
         return user
@@ -35,6 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_freelancer = models.BooleanField(default=False)
+    is_moderator = models.BooleanField(default=False)
+    is_employer = models.BooleanField(default=False)
 
     objects = UserManager()
     # assign the custom manager to the user model
